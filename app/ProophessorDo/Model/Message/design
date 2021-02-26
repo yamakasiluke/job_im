@@ -1,0 +1,64 @@
+            sender                          server                                          reciever
+inbox process online
+
+            SendMessageToGroup
+                                       response? yes
+            success or fail?
+                                       fail then ask to resend
+                                       success then put in to inbox
+                                       online or offline
+                                       offline then notification?
+                                       online then push
+                                       push success or fail
+                                       fail then repush
+                                                                                 response? yes
+                                       success then report
+                                       SendRecievedStatusToGroup
+                                       inbox process except no response?
+                                       we dont really need response ? no we need !
+
+
+inbox process offline
+                                                                                RefreshMessage
+                                                                                pull inbox
+                                                                                success or fail
+                                       SendRecievedStatusToGroup
+                                       inbox process
+
+
+big group process online
+
+
+big group process offline
+
+
+
+message online process
+            sender                          server                                          reciever
+    SendMessageToGroup
+
+    success or fail                      response true or false
+
+                                        store data and push to EE                    response 1 or 0
+
+                                        push ok or no? ok then
+                                  if is not SendMessageStatusToGroup
+                                 then SendMessageStatusToGroup as sender
+                                 we dont neet to send status for SendMessageStatusToGroup
+
+big group mode
+inbox mode
+
+
+SendMessageToGroup
+SendMessageStatusToGroup
+SendReadStatusToGroup
+SendPullMessageToGroup
+
+
+
+
+
+
+
+
