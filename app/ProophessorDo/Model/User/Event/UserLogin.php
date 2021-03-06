@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\User\Event;
 
+use Illuminate\Support\Facades\Auth;
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\ProophessorDo\Model\User\EmailAddress;
 use Prooph\ProophessorDo\Model\User\UserId;
@@ -19,68 +20,12 @@ use Prooph\ProophessorDo\Model\User\UserName;
 
 final class  UserLogin extends AggregateChanged
 {
-    /**
-     * @var UserId
-     */
-    private $userId;
-
-    /**
-     * @var UserName
-     */
-    private $username;
-    // status
-    // userid?
-    // {
-    //      data {}
-    //      status 200 500
-    //      message ""
-    //  }
-    // status
-    // {user}?
-    /**
-     * @var EmailAddress
-     */
-    private $emailAddress;
-
-    public static function withData(UserId $userId, UserName $name, EmailAddress $emailAddress): UserWasRegistered
+    public static function withData(UserId $userId): UserLogin
     {
         /** @var self $event */
         $event = self::occur($userId->toString(), [
-            'name' => $name->toString(),
-            'email' => $emailAddress->toString(),
         ]);
-
-        $event->userId = $userId;
-        $event->username = $name;
-        $event->emailAddress = $emailAddress;
-
         return $event;
     }
 
-    public function userId(): UserId
-    {
-        if (null === $this->userId) {
-            $this->userId = UserId::fromString($this->aggregateId());
-        }
-
-        return $this->userId;
-    }
-
-    public function name(): UserName
-    {
-        if (null === $this->username) {
-            $this->username = UserName::fromString($this->payload['name']);
-        }
-
-        return $this->username;
-    }
-
-    public function emailAddress(): EmailAddress
-    {
-        if (null === $this->emailAddress) {
-            $this->emailAddress = EmailAddress::fromString($this->payload['email']);
-        }
-
-        return $this->emailAddress;
-    }
 }

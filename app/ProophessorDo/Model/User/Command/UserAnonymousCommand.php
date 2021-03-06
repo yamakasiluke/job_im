@@ -28,8 +28,7 @@ final class UserAnonymousCommand extends Command implements PayloadConstructable
 //email
 
 //$request->validate([
-//'email' => 'required|email',
-//'device_name' => 'required',
+//'username' => 'required',
 //]);
 
     public static function withData(string $userId, string $name, string $email): RegisterUser

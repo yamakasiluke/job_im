@@ -24,12 +24,12 @@ final class SendMessageToGroupMemberCommand extends Command implements PayloadCo
 {
     use PayloadTrait;
 
-    public static function withData(string $groupId, string $messageText, string $messageId): SendMessageToGroupMemberCommand
+    public static function withData(GroupId $groupId, MessageText $messageText, MessageId $messageId): SendMessageToGroupMemberCommand
     {
         return new self([
-            'group_id' => $groupId,
-            'message_text' => $messageText,
-            'message_id' => $messageId,
+            'group_id' => $groupId->toString(),
+            'message_text' => $messageText->toString(),
+            'message_id' => $messageId->toString(),
         ]);
     }
 

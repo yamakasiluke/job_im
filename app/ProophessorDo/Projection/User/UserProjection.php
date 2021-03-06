@@ -20,7 +20,7 @@ use Prooph\ProophessorDo\Model\Todo\Event\TodoWasMarkedAsExpired;
 use Prooph\ProophessorDo\Model\Todo\Event\TodoWasPosted;
 use Prooph\ProophessorDo\Model\Todo\Event\TodoWasReopened;
 use Prooph\ProophessorDo\Model\Todo\Event\TodoWasUnmarkedAsExpired;
-use Prooph\ProophessorDo\Model\User\Event\UserWasRegistered;
+use Prooph\ProophessorDo\Model\User\Event\RegisterUser;
 
 /**
  * Class UserProjection
@@ -32,13 +32,14 @@ final class UserProjection implements ReadModelProjection
     {
         $projector->fromStream('event_stream')
             ->when([
-                UserWasRegistered::class => function ($state, UserWasRegistered $event) {
+                RegisterUser::class => function ($state, RegisterUser $event) {
                     /** @var UserReadModel $readModel */
                     $readModel = $this->readModel();
                     $readModel->stack('insert', [
                         'id' => $event->userId()->toString(),
                         'name' => $event->name()->toString(),
                         'email' => $event->emailAddress()->toString(),
+                        'password' => $event->password(),
                     ]);
                 },
                 TodoWasPosted::class => function ($state, TodoWasPosted $event) {

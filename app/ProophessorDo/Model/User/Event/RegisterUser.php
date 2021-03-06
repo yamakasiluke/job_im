@@ -32,24 +32,21 @@ final class RegisterUser extends AggregateChanged
      * @var EmailAddress
      */
     private $emailAddress;
-    // {
-    //      data {}
-    //      status 200 500
-    //      message ""
-    //  }
-    // status
-    // {user}?
-    public static function withData(UserId $userId, UserName $name, EmailAddress $emailAddress): RegisterUser
+
+    private $password;
+    public static function withData(UserId $userId, UserName $name, EmailAddress $emailAddress, string $password): RegisterUser
     {
         /** @var self $event */
         $event = self::occur($userId->toString(), [
             'name' => $name->toString(),
             'email' => $emailAddress->toString(),
+            'password' => $password,
         ]);
 
         $event->userId = $userId;
         $event->username = $name;
         $event->emailAddress = $emailAddress;
+        $event->password = $password;
 
         return $event;
     }
@@ -79,5 +76,14 @@ final class RegisterUser extends AggregateChanged
         }
 
         return $this->emailAddress;
+    }
+
+    public function password(): string
+    {
+        if (null === $this->password) {
+            $this->password = $this->payload['password'];
+        }
+
+        return $this->password;
     }
 }

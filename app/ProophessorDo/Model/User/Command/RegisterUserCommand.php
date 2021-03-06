@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Prooph\ProophessorDo\Model\User\Command;
 
 use Assert\Assertion;
+use Illuminate\Support\Facades\Hash;
 use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadConstructable;
 use Prooph\Common\Messaging\PayloadTrait;
@@ -31,15 +32,15 @@ final class RegisterUserCommand extends Command implements PayloadConstructable
 //$request->validate([
 //'email' => 'required|email',
 //'password' => 'required',
-//'device_name' => 'required',
 //]);
 
-    public static function withData(string $userId, string $name, string $email): RegisterUserCommand
+    public static function withData(string $userId, string $name, string $password, string $email): RegisterUserCommand
     {
         return new self([
             'user_id' => $userId,
             'name' => $name,
             'email' => $email,
+            'password' => $password,
         ]);
     }
 
@@ -50,7 +51,15 @@ final class RegisterUserCommand extends Command implements PayloadConstructable
 
     public function name(): UserName
     {
-        return UserName::fromString($this->payload['name']);
+        if(isset($this->payload['name']))
+            return UserName::fromString($this->payload['name']);
+        else
+            return UserName::fromString("noname");
+    }
+
+    public function password(): string
+    {
+        return $this->payload['password'];
     }
 
     public function emailAddress(): EmailAddress
@@ -62,8 +71,8 @@ final class RegisterUserCommand extends Command implements PayloadConstructable
     {
         Assertion::keyExists($payload, 'user_id');
         Assertion::uuid($payload['user_id']);
-        Assertion::keyExists($payload, 'name');
-        Assertion::string($payload['name']);
+        Assertion::keyExists($payload, 'password');
+        Assertion::string($payload['password']);
         Assertion::keyExists($payload, 'email');
         $validator = new EmailAddressValidator();
         Assertion::true($validator->isValid($payload['email']));

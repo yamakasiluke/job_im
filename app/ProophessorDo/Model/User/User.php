@@ -12,14 +12,15 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\User;
 
+use Illuminate\Support\Facades\Hash;
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventSourcing\AggregateRoot;
 use Prooph\ProophessorDo\Model\Entity;
 use Prooph\ProophessorDo\Model\Todo\Todo;
 use Prooph\ProophessorDo\Model\Todo\TodoId;
-use Prooph\ProophessorDo\Model\User\AccessToken;
 use Prooph\ProophessorDo\Model\Todo\TodoText;
 use Prooph\ProophessorDo\Model\User\Event\RegisterUser;
+use Prooph\ProophessorDo\Model\User\Event\UserLogin;
 use Prooph\ProophessorDo\Model\User\Event\UserOffline;
 use Prooph\ProophessorDo\Model\User\Event\UserOnline;
 use Prooph\ProophessorDo\Model\User\Event\UserWasRegisteredAgain;
@@ -63,15 +64,17 @@ final class User extends AggregateRoot implements Entity
      * @var EmailAddress
      */
     private $emailAddress;
+    private $password;
 
     public static function registerWithData(
         UserId $userId,
         UserName $name,
-        EmailAddress $emailAddress
+        EmailAddress $emailAddress,
+        $password
     ): User {
         $self = new self();
-
-        $self->recordThat(RegisterUser::withData($userId, $name, $emailAddress));
+        $password = Hash::make($password);
+        $self->recordThat(RegisterUser::withData($userId, $name, $emailAddress, $password));
 
         return $self;
     }
@@ -81,9 +84,9 @@ final class User extends AggregateRoot implements Entity
         $this->recordThat(UserWasRegisteredAgain::withData($this->userId, $name, $this->emailAddress));
     }
 
-    public function userLogin(UserName $name): void
+    public function userLogin(): void
     {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
+        $this->recordThat(UserLogin::withData($this->userId));
     }
 
     public function userLogout(UserName $name): void
@@ -127,6 +130,10 @@ final class User extends AggregateRoot implements Entity
     {
         return $this->fd;
     }
+    public function isOnline(): bool
+    {
+        return isset($this->fd);
+    }
 
     public function emailAddress(): EmailAddress
     {
@@ -148,6 +155,7 @@ final class User extends AggregateRoot implements Entity
         $this->userId = $event->userId();
         $this->name = $event->name();
         $this->emailAddress = $event->emailAddress();
+        $this->password = $event->password();
 
     }
 
@@ -158,6 +166,9 @@ final class User extends AggregateRoot implements Entity
         global $server;
         if(isset($server))
             $server->push($this->fd, "herere send buy event");
+    }
+    protected function whenUserLogin(): void
+    {
     }
 
     protected function whenUserOffline(UserOffline $event): void

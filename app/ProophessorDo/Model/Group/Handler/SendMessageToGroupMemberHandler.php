@@ -55,7 +55,8 @@ class SendMessageToGroupMemberHandler
         $members = [];
         foreach ($group->onlineMembers() as $id){
             $user = $this->userCollection->get(UserId::fromString($id));
-            $members[$id] = $user->fd();
+            if($user->isOnline())
+                $members[$id] = $user->fd();
         }
 
         $group->sendMessageToGroupMember($command->groupId(), $command->messageId(),  $command->messageText(), $members);

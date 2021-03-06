@@ -7,6 +7,8 @@
  * @author   Taylor Otwell <taylor@laravel.com>
  */
 
+use Illuminate\Support\Facades\App;
+
 define('LARAVEL_START', microtime(true));
 
 /*
@@ -116,6 +118,8 @@ $server->on('handshake', function (\Swoole\Http\Request $request, \Swoole\Http\R
 
     $response->status(101);
     $response->end();
+
+    // step 1 online get fd
     return true;
 });
 
@@ -129,7 +133,7 @@ $server->on('message', function (Swoole\WebSocket\Server $server, $frame) {
     global $kernel;
     $d = json_decode($frame->data);
     $d->fd = $frame->fd;
-
+    // step 2 send command
     $req = Illuminate\Http\Request::create(
         "/api/commands/send-message-to-group-member",
         'POST',
@@ -145,12 +149,23 @@ $server->on('message', function (Swoole\WebSocket\Server $server, $frame) {
 });
 
 $server->on('close', function ($ser, $fd) {
+    // step 3 offline
     echo "client {$fd} closed\n";
 });
 
 
 $server->on('request', function (swoole_http_request $request, swoole_http_response $response) {
-//    echo "herer1";
+    global $kernel;
+    $req = Illuminate\Http\Request::create(
+        "/api/commands/send-message-to-group-member",
+        'POST'
+    );
+    $r = $kernel->handle($req
+    );
+    global $app;
+    $app->call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+    var_dump($app->call('App\Http\Controllers\ApiCommandController@postAction', [$request]));
+    //    echo "herer1";
 //    global $kernel,$app;
 //    $a = $app->make(Prooph\ServiceBus\CommandBus::class);
 //    var_dump($a);
@@ -166,7 +181,6 @@ $server->on('request', function (swoole_http_request $request, swoole_http_respo
 //    $r = $kernel->handle($req
 //    );
 //    $response->end($r->getContent());
-
 
 
 //    $uri = $request->server["request_uri"];
@@ -364,7 +378,8 @@ $server->on('request', function (swoole_http_request $request, swoole_http_respo
 
         </html>
 HTML;
-    $response->end($res);
+//    $response->end($res);
+    $response->end();
 
 });
 $server->start();

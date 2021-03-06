@@ -70,7 +70,7 @@ final class Group extends AggregateRoot implements Entity
 
     protected function WhenEnterGroup(EnterGroup $event): void {
         $this->groupId = $event->groupId();
-        $this->members = array_merge($this->members, $event->members());
+        $this->members = array_unique(array_merge($this->members, $event->members()));
     }
     protected function WhenSendMessageToGroupMember(SendMessageToGroupMember $event): void {
         $this->lastMessage = $event->messageText();
@@ -98,7 +98,9 @@ final class Group extends AggregateRoot implements Entity
 
     public function enterGroup(GroupId $groupId,array $members): void
     {
-        $this->recordThat(EnterGroup::withData($groupId, $members));
+        $newMembers = array_diff($members, $this->members);
+
+        $this->recordThat(EnterGroup::withData($groupId, $newMembers));
     }
 
     public function sendMessageToGroupMember(GroupId $groupId, MessageId $messageId, MessageText $messageText, array $members): void
@@ -129,9 +131,14 @@ final class Group extends AggregateRoot implements Entity
         $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
     }
 
-    public function userId(): UserId
+    public function groupId(): GroupId
     {
-        return $this->userId;
+        return $this->groupId;
+    }
+
+    public function owner(): UserId
+    {
+        return $this->owner;
     }
 
     public function name(): UserName

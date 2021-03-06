@@ -14,7 +14,7 @@ namespace Prooph\ProophessorDo\Model\User\Exception;
 
 final class NeedLogin extends \InvalidArgumentException
 {
-    public static function reason(string $msg): InvalidName
+    public static function reason(string $msg): NeedLogin
     {
         return new self('Invalid user name because ' . $msg);
     }

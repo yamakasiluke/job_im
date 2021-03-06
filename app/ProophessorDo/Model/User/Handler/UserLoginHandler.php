@@ -14,6 +14,7 @@ namespace Prooph\ProophessorDo\Model\User\Handler;
 
 use Prooph\ProophessorDo\Model\User\Command\UserLoginCommand;
 use Prooph\ProophessorDo\Model\User\Command\UserOnlineCommand;
+use Prooph\ProophessorDo\Model\User\Exception\NeedLogin;
 use Prooph\ProophessorDo\Model\User\Exception\UserNotFound;
 use Prooph\ProophessorDo\Model\User\Query\GetAllUsers;
 use Prooph\ProophessorDo\Model\User\UserCollection;
@@ -44,8 +45,12 @@ class UserLoginHandler
         } else {
 //            global $server, $frame;
 //            $user->userOnline($frame->fd);
-            $user->userOnline($command->fd());
+            $user->userLogin();
         }
+
+
+
+
 
         $this->userCollection->save($user);
     }

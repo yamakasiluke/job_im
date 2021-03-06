@@ -34,7 +34,7 @@ final class CreateGroupCommand extends Command implements PayloadConstructable
 
     public function groupId(): GroupId
     {
-        return GroupId::generate();
+        return GroupId::fromString($this->payload['group_id']);
     }
 
     public function owner(): UserId
@@ -49,10 +49,15 @@ final class CreateGroupCommand extends Command implements PayloadConstructable
 
     protected function setPayload(array $payload): void
     {
-//        Assertion::keyExists($payload, 'group_id');
-//        Assertion::uuid($payload['group_id']);
+        Assertion::keyExists($payload, 'group_id');
+        Assertion::uuid($payload['group_id']);
         Assertion::keyExists($payload, 'owner');
         Assertion::uuid($payload['owner']);
+        Assertion::keyExists($payload, 'members');
+        Assertion::notEmpty($payload['members']);
+        foreach ($payload['members'] as $member){
+            Assertion::uuid($member);
+        }
 
         $this->payload = $payload;
     }

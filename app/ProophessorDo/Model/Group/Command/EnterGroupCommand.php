@@ -23,17 +23,17 @@ final class EnterGroupCommand extends Command implements PayloadConstructable
 {
     use PayloadTrait;
 
-    public static function withData(string $groupId, string $owner, string $members): EnterGroupCommand
+    public static function withData(string $groupId, string $members): EnterGroupCommand
     {
         return new self([
             'group_id' => $groupId,
-            '$members' => $members,
+            'members' => $members,
         ]);
     }
 
     public function groupId(): GroupId
     {
-        return GroupId::generate();
+        return GroupId::fromString($this->payload['group_id']);
     }
 
 
@@ -46,8 +46,12 @@ final class EnterGroupCommand extends Command implements PayloadConstructable
     {
         Assertion::keyExists($payload, 'group_id');
         Assertion::uuid($payload['group_id']);
-        Assertion::keyExists($payload, '$members');
-        Assertion::isArray($payload['group_id']);
+        Assertion::keyExists($payload, 'members');
+        Assertion::isArray($payload['members']);
+        Assertion::notEmpty($payload['members']);
+        foreach ($payload['members'] as $member){
+            Assertion::uuid($member);
+        }
 
         $this->payload = $payload;
     }

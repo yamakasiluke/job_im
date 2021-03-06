@@ -67,7 +67,13 @@ final class Message extends AggregateRoot implements Entity
     ): Message {
         $self = new self();
 
-        $self->recordThat(SendMessageToGroup::withData($messageId, $sender, $senderId, $receiver, $receiverId, $messageText));
+        $self->recordThat(SendMessageToGroup::withData(
+            $messageId,
+            $sender,
+            $senderId,
+            $receiver,
+            $receiverId,
+            $messageText));
 
         return $self;
     }
@@ -77,14 +83,14 @@ final class Message extends AggregateRoot implements Entity
         $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
     }
 
-    public function userId(): UserId
+    public function messageId(): MessageId
     {
-        return $this->userId;
+        return $this->messageId;
     }
 
-    public function name(): UserName
+    public function messageText(): MessageText
     {
-        return $this->name;
+        return $this->messageText;
     }
 
     public function emailAddress(): EmailAddress

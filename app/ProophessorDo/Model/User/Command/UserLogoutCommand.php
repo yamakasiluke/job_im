@@ -25,15 +25,12 @@ final class UserLogoutCommand extends Command implements PayloadConstructable
 {
     use PayloadTrait;
     // userid?
-//    {user}
     // token
 
     public static function withData(string $userId, string $name, string $email): RegisterUser
     {
         return new self([
             'user_id' => $userId,
-            'name' => $name,
-            'email' => $email,
         ]);
     }
 

@@ -13,11 +13,13 @@ declare(strict_types=1);
 namespace Prooph\ProophessorDo\Model\Message\Handler;
 
 use Prooph\ProophessorDo\Model\Message\Command\SendMessageToGroupCommand;
+use Prooph\ProophessorDo\Model\Message\Event\SendMessageToGroup;
 use Prooph\ProophessorDo\Model\Message\Exception\UserAlreadyExists;
 use Prooph\ProophessorDo\Model\Message\Exception\UserNotFound;
 use Prooph\ProophessorDo\Model\Message\Service\ChecksUniqueUsersEmailAddress;
 use Prooph\ProophessorDo\Model\Message\Message;
 use Prooph\ProophessorDo\Model\Message\MessageList;
+use Prooph\ServiceBus\EventBus;
 
 class SendMessageToGroupHandler
 {
@@ -25,11 +27,17 @@ class SendMessageToGroupHandler
      * @var MessageList
      */
     private $messageList;
+    /**
+     * @var EventBus
+     */
+    private $eventBus;
 
     public function __construct(
-        MessageList $messageList
+        MessageList $messageList,
+        EventBus $eventBus
     ) {
         $this->messageList = $messageList;
+        $this->eventBus = $eventBus;
     }
     //'sender' => Sender,
 //'receiver' => $receiver->toString(),
@@ -47,7 +55,15 @@ class SendMessageToGroupHandler
             $command->receiverId(),
             $command->messageText()
         );
-
+        // TODO:  do some validate
+//        senderId is userid self
+//        receiverId is groupid valid
         $this->messageList->save($message);
+        $this->eventBus->dispatch(SendMessageToGroup::withData($command->messageId(),
+            $command->sender(),
+            $command->senderId(),
+            $command->receiver(),
+            $command->receiverId(),
+            $command->messageText()));
     }
 }

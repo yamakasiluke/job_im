@@ -13,6 +13,7 @@ use Prooph\ProophessorDo\Model\User\UserId;
 
 class User extends Authenticatable
 {
+    use HasFactory, Notifiable, HasApiTokens;
 
     public function __construct(array $attributes = [])
     {
@@ -20,7 +21,6 @@ class User extends Authenticatable
         parent::__construct($attributes);
     }
 
-    use HasFactory, Notifiable, HasApiTokens;
     protected $table = 'read_user';
     /**
      * The attributes that are mass assignable.

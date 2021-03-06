@@ -16,6 +16,7 @@ use Prooph\ProophessorDo\Model\User\Command\RegisterUser;
 use Prooph\ProophessorDo\Model\User\Command\UserOnlineCommand;
 use Prooph\ProophessorDo\Model\User\Exception\UserAlreadyExists;
 use Prooph\ProophessorDo\Model\User\Exception\UserNotFound;
+use Prooph\ProophessorDo\Model\User\Exception\UserNotUseIm;
 use Prooph\ProophessorDo\Model\User\Query\GetAllUsers;
 use Prooph\ProophessorDo\Model\User\Service\ChecksUniqueUsersEmailAddress;
 use Prooph\ProophessorDo\Model\User\User;
@@ -41,6 +42,9 @@ class UserOnlineHandler
 
     public function __invoke(UserOnlineCommand $command): void
     {
+        global $server;
+        if(!isset($server))
+            throw UserNotUseIm::withUserId($command->userId());
         if (! $user = $this->userCollection->get($command->userId())) {
             throw UserNotFound::withUserId($command->userId());
         } else {

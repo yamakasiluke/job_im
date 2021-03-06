@@ -19,35 +19,42 @@ use Prooph\ProophessorDo\Model\User\UserId;
 final class  ApplyAccessToken extends AggregateChanged
 {
     /**
-     * @var UserId
-     */
-    private $userId;
-    /**
      * @var TokenId
      */
     private $tokenId;
 
+    private $tokenableType;
     /**
-     * @var AccessToken
+     * @var UserId
      */
-    private $accessToken;
+    private $tokenableId;
+    private $name;
+    private $token;
+    private $abilities;
 
-    // {
-    //      data {}
-    //      status 200 500
-    //      message ""
-    //  }
-    // token
-    // userid?
-    public static function withData(UserId $userId, TokenId $tokenId): ApplyAccessToken
+    public static function withData(
+        TokenId $tokenId,
+        UserId $tokenableId,
+        $name,
+        $token,
+        $tokenableType,
+        $abilities): ApplyAccessToken
     {
         /** @var self $event */
         $event = self::occur($tokenId->toString(), [
-            'user_id' => $userId->toString(),
+            'tokenable_id' => $tokenableId->toString(),
+            'name' => $name,
+            'token' => $token,
+            'abilities' => $abilities,
+            'tokenable_type' => $tokenableType,
         ]);
 
-        $event->userId = $userId;
         $event->tokenId = $tokenId;
+        $event->tokenableId = $tokenableId;
+        $event->name = $name;
+        $event->token = $token;
+        $event->abilities = $abilities;
+        $event->tokenableType = $tokenableType;
 
         return $event;
     }
@@ -60,31 +67,40 @@ final class  ApplyAccessToken extends AggregateChanged
 
         return $this->tokenId;
     }
-
-    public function userId(): UserId
+    public function tokenableId(): UserId
     {
-        if (null === $this->userId) {
-            $this->userId = UserId::fromString($this->aggregateId());
+        if (null === $this->tokenableId) {
+            $this->tokenableId = UserId::fromString($this->payload['tokenable_id']);
         }
-
-        return $this->userId;
+        return $this->tokenableId;
+    }
+    public function tokenableType(): string
+    {
+        if (null === $this->tokenableType) {
+            $this->tokenableType = $this->payload['tokenable_type'];
+        }
+        return $this->tokenableType;
+    }
+    public function name(): string
+    {
+        if (null === $this->name) {
+            $this->name = $this->payload['name'];
+        }
+        return $this->name;
     }
 
-    public function name(): UserName
+    public function token(): string
     {
-        if (null === $this->username) {
-            $this->username = UserName::fromString($this->payload['name']);
+        if (null === $this->token) {
+            $this->token = $this->payload['token'];
         }
-
-        return $this->username;
+        return $this->token;
     }
-
-    public function emailAddress(): EmailAddress
+    public function abilities(): array
     {
-        if (null === $this->emailAddress) {
-            $this->emailAddress = EmailAddress::fromString($this->payload['email']);
+        if (null === $this->abilities) {
+            $this->abilities = $this->payload['abilities'];
         }
-
-        return $this->emailAddress;
+        return $this->abilities;
     }
 }

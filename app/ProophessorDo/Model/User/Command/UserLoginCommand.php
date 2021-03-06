@@ -31,14 +31,15 @@ final class UserLoginCommand extends Command implements PayloadConstructable
 //$request->validate([
 //'email' => 'required|email',
 //'password' => 'required',
-//'device_name' => 'required',
 //]);
 
-    public static function withData(string $userId, string $name, string $email): UserLoginCommand
+
+    public static function withData(string $userId, string $email, string $password): UserLoginCommand
     {
         return new self([
-            'name' => $name,
+            'user_id' => $userId,
             'email' => $email,
+            'password' => $password,
         ]);
     }
 
@@ -47,9 +48,9 @@ final class UserLoginCommand extends Command implements PayloadConstructable
         return UserId::fromString($this->payload['user_id']);
     }
 
-    public function name(): UserName
+    public function password(): string
     {
-        return UserName::fromString($this->payload['name']);
+        return $this->payload['password'];
     }
 
     public function emailAddress(): EmailAddress
@@ -59,10 +60,8 @@ final class UserLoginCommand extends Command implements PayloadConstructable
 
     protected function setPayload(array $payload): void
     {
-        Assertion::keyExists($payload, 'user_id');
-        Assertion::uuid($payload['user_id']);
-        Assertion::keyExists($payload, 'name');
-        Assertion::string($payload['name']);
+        Assertion::keyExists($payload, 'password');
+        Assertion::string($payload['password']);
         Assertion::keyExists($payload, 'email');
         $validator = new EmailAddressValidator();
         Assertion::true($validator->isValid($payload['email']));

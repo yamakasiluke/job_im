@@ -27,32 +27,30 @@ final class AccessToken extends AggregateRoot implements Entity
 //string('name');
 //string('token', 64)->unique();
 //text('abilities')->nullable();
-//timestamp('last_used_at')->nullable();
-//timestamps();
 
     /**
      * @var TokenId
      */
     private $tokenId;
 
-    /**
-     * @var DeviceName
-     */
-    private $deviceName;
+    private $tokenableType;
 
+    private $tokenableId;
+    private $name;
+    private $token;
+    private $abilities;
 
-    /**
-     * @var AccessToken
-     */
-    private $accessToken;
 
 
     public static function applyToken(
-        UserId $userId,
-        TokenId $tokenId
+        TokenId $tokenId,
+        UserId $tokenableId,
+        $name,
+        $token,
+        $tokenableType,
+        $abilities
     ): AccessToken {
 
-//
 //        $request->validate([
 ////        'email' => 'required|email',
 ////        'password' => 'required',
@@ -61,66 +59,15 @@ final class AccessToken extends AggregateRoot implements Entity
 
         $self = new self();
 
-        $self->recordThat(ApplyAccessToken::withData($userId, $tokenId));
+        $self->recordThat(ApplyAccessToken::withData(
+            $tokenId,
+            $tokenableId,
+            $name,
+            $token,
+            $tokenableType,
+            $abilities));
 
         return $self;
-    }
-
-    public function registerAgain(UserName $name): void
-    {
-        $this->recordThat(UserWasRegisteredAgain::withData($this->userId, $name, $this->emailAddress));
-    }
-
-    public function userLogin(UserName $name): void
-    {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
-    }
-
-    public function userLogout(UserName $name): void
-    {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
-    }
-
-    public function userOnline(UserName $name): void
-    {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
-    }
-
-    public function userOffline(UserName $name): void
-    {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
-    }
-
-    public function userAnoymouse(UserName $name): void
-    {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
-    }
-
-    public function applyAccessToken(UserName $name): void
-    {
-        $this->recordThat(BlockFriend::withData($this->userId, $name, $this->emailAddress));
-    }
-
-
-
-    public function userId(): UserId
-    {
-        return $this->userId;
-    }
-
-    public function name(): UserName
-    {
-        return $this->name;
-    }
-
-    public function emailAddress(): EmailAddress
-    {
-        return $this->emailAddress;
-    }
-
-    public function postTodo(TodoText $text, TodoId $todoId): Todo
-    {
-        return Todo::post($text, $this->userId(), $todoId);
     }
 
     protected function aggregateId(): string
@@ -130,24 +77,18 @@ final class AccessToken extends AggregateRoot implements Entity
 
     protected function whenApplyAccessToken(ApplyAccessToken $event): void
     {
-        $this->userId = $event->userId();
         $this->tokenId = $event->tokenId();
-    }
-
-    protected function whenUserWasRegistered(UserWasRegistered $event): void
-    {
-        $this->userId = $event->userId();
+        $this->tokenableId = $event->tokenableId();
+        $this->tokenableType = $event->tokenableType();
         $this->name = $event->name();
-        $this->emailAddress = $event->emailAddress();
+        $this->token = $event->token();
+        $this->abilities = $event->abilities();
     }
 
-    protected function whenUserWasRegisteredAgain(UserWasRegisteredAgain $event): void
-    {
-    }
 
     public function sameIdentityAs(Entity $other): bool
     {
-        return get_class($this) === get_class($other) && $this->userId->sameValueAs($other->userId);
+        return get_class($this) === get_class($other) && $this->tokenId->sameValueAs($other->tokenId);
     }
 
     /**

@@ -16,6 +16,7 @@ use Assert\Assertion;
 use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadConstructable;
 use Prooph\Common\Messaging\PayloadTrait;
+use Prooph\ProophessorDo\Model\AccessToken\TokenId;
 use Prooph\ProophessorDo\Model\User\EmailAddress;
 use Prooph\ProophessorDo\Model\User\UserId;
 use Prooph\ProophessorDo\Model\User\UserName;
@@ -25,6 +26,15 @@ use Zend\Validator\EmailAddress as EmailAddressValidator;
 final class ApplyAccessTokenCommand extends Command implements PayloadConstructable
 {
     use PayloadTrait;
+
+
+//$request->validate([
+//'email' => 'required|email',
+//'password' => 'required',
+//'device_name' => 'required',
+//]);
+
+
     // username
     // password
 //
@@ -33,53 +43,81 @@ final class ApplyAccessTokenCommand extends Command implements PayloadConstructa
 //'password' => 'required',
 //'device_name' => 'required',
 //]);
-    public static function withData(string $userId, string $name, string $email): ApplyAccessTokenCommand
+    public static function withData(
+        string $tokenId,
+        string $tokenableId,
+        string $name,
+        string $token,
+        string $tokenableType = "App\\Models\\User",
+        array $abilities = ['*']): ApplyAccessTokenCommand
     {
 //        $request->validate([
 //            'email' => 'required|email',
 //            'password' => 'required',
 //            'device_name' => 'required',
 //        ]);
-
+//        UserId $tokenableId,
+//        TokenId $tokenId,
+//        $tokenableType,
+//        $name,
+//        $token,
+//        $abilities): ApplyAccessToken
         return new self([
-            'user_id' => $userId,
+            'token_id' => $tokenId,
+            'tokenable_id' => $tokenableId,
+            'tokenable_type' => $tokenableType,
             'name' => $name,
-            'email' => $email,
+            'token' => $token,
+            'abilities' => $abilities,
         ]);
     }
-    public function userId(): UserId
+    public function tokenId(): TokenId
     {
-        return UserId::fromString($this->payload['user_id']);
+        if(isset($this->payload['token_id']))
+            return TokenId::fromString($this->payload['token_id']);
+        else
+            return TokenId::generate();
     }
-    public function deviceName(): DeviceName
+    public function tokenableId(): UserId
     {
-        return DeviceName::fromString($this->payload['device_name']);
+        return UserId::fromString($this->payload['tokenable_id']);
+    }
+    public function tokenableType(): string
+    {
+        if(isset($this->payload['tokenable_type']))
+            return $this->payload['tokenable_type'];
+        else
+            return "App\\Models\\User";
+    }
+    public function name(): string
+    {
+        return $this->payload['name'];
+    }
+    public function token(): string
+    {
+        return $this->payload['token'];
+    }
+    public function abilities(): array
+    {
+        if (isset($this->payload['abilities']))
+            return $this->payload['abilities'];
+        else
+            return ['*'];
     }
 
 
-    public function name(): UserName
-    {
-        return UserName::fromString($this->payload['name']);
-    }
 
-    public function emailAddress(): EmailAddress
-    {
-        return EmailAddress::fromString($this->payload['email']);
-    }
-    // username
-    // password
-    // anoymouse
 
-//    protected function setPayload(array $payload): void
-//    {
-//        Assertion::keyExists($payload, 'user_id');
-//        Assertion::uuid($payload['user_id']);
-//        Assertion::keyExists($payload, 'name');
-//        Assertion::string($payload['name']);
+    protected function setPayload(array $payload): void
+    {
+        Assertion::keyExists($payload, 'tokenable_id');
+        Assertion::uuid($payload['tokenable_id']);
+        Assertion::keyExists($payload, 'token');
+        Assertion::string($payload['token']);
 //        Assertion::keyExists($payload, 'email');
 //        $validator = new EmailAddressValidator();
 //        Assertion::true($validator->isValid($payload['email']));
-//
-//        $this->payload = $payload;
-//    }
+
+        $this->payload = $payload;
+    }
 }

@@ -38,7 +38,25 @@ class ApplyAccessTokenHandler
 
     public function __invoke(ApplyAccessTokenCommand $command): void
     {
-        $user = AccessToken::applyToken($command->userId(), TokenId::generate());
+
+//
+//        $user = User::where('email', $request->email)->first();
+//        if (! $user || ! Hash::check($request->password, $user->password)) {
+//            throw ValidationException::withMessages([
+//                'email' => ['The provided credentials are incorrect.'],
+//            ]);
+//        }
+////    return $user->tokens()->getResults();
+//
+//        return $user->createToken($user->id, $request->device_name)->plainTextToken;
+        $user = AccessToken::applyToken(
+            $command->tokenId(),
+            $command->tokenableId(),
+            $command->name(),
+            $command->token(),
+            $command->tokenableType(),
+            $command->abilities(),
+        );
 
         $this->tokenList->save($user);
 

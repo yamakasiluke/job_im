@@ -38,10 +38,15 @@ final class SendMessageToGroupCommand extends Command implements PayloadConstruc
 
     public static function withData(string $messageText, string $senderId, string $receiverId): SendMessageToGroupCommand
     {
+        //Todo change this to user defined MessageID? and sender and recieber
+        // user define from api.php
         return new self([
             'message_text' => $messageText,
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
+//            'message_id' => $receiverId,
+//            'sender' => $receiverId,
+//            'receiver' => $receiverId,
         ]);
     }
     public function messageId(): MessageId

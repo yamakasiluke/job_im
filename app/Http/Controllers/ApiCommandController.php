@@ -94,7 +94,9 @@ class  ApiCommandController extends Controller
 
     private function getPayloadFromRequest(Request $request): array
     {
-        $payload = json_decode($request->getContent(), true);
+//        $payload = json_decode($request->getContent(), true);
+        $payload = $request->json()->all();
+
 
         switch (json_last_error()) {
             case JSON_ERROR_DEPTH:
