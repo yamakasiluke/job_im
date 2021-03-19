@@ -162,10 +162,10 @@ final class User extends AggregateRoot implements Entity
     protected function whenUserOnline(UserOnline $event): void
     {
         $this->fd = $event->fd();
-
-        global $server;
-        if(isset($server))
-            $server->push($this->fd, "herere send buy event");
+//
+//        global $server;
+//        if(isset($server))
+//            $server->push($this->fd, "herere send buy event");
     }
     protected function whenUserLogin(): void
     {

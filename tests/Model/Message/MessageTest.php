@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Model\MessageTest;
+namespace Tests\Model;
 
 use Prooph\ProophessorDo\Model\Group\Event\CreateGroup;
 use Prooph\ProophessorDo\Model\Group\Event\EnterGroup;
@@ -25,7 +25,7 @@ use Prooph\ProophessorDo\Model\Message\MessageText;
 use Prooph\ProophessorDo\Model\Message\Receiver;
 use Prooph\ProophessorDo\Model\Message\Sender;
 use Prooph\ProophessorDo\Model\User\UserId;
-use Tests\Model\GroupTest\GroupTest;
+use Tests\Model\GroupTest;
 use Tests\TestCase;
 
 class MessageTest extends TestCase

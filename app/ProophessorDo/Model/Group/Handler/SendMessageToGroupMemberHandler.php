@@ -12,8 +12,11 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\Group\Handler;
 
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Prooph\ProophessorDo\Model\Group\Command\SendMessageToGroupMemberCommand;
 use Prooph\ProophessorDo\Model\Group\GroupCollection;
+use Prooph\ProophessorDo\Model\User\Exception\UserNotUseIm;
 use Prooph\ProophessorDo\Model\User\Service\ChecksUniqueUsersEmailAddress;
 use Prooph\ProophessorDo\Model\User\UserCollection;
 use Prooph\ProophessorDo\Model\User\UserId;
@@ -49,6 +52,13 @@ class SendMessageToGroupMemberHandler
 //        }
 //        if ($group = $this->groupCollection->get($command->groupId())) {
 //            throw UserAlreadyExists::withUserId($command->groupId());
+//        }
+//
+//        if (!App::environment('testing')) {
+//            global $server;
+//            if(!isset($server))
+//                throw UserNotUseIm::withUserId(
+//                    UserId::fromString(Auth::id()));
 //        }
         $group = $this->groupCollection->get($command->groupId());
         // TODO: userfinder this is slow

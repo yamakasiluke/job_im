@@ -12,16 +12,13 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\User\Handler;
 
-use Prooph\ProophessorDo\Model\User\Command\RegisterUser;
+use Illuminate\Support\Facades\App;
 use Prooph\ProophessorDo\Model\User\Command\UserOnlineCommand;
-use Prooph\ProophessorDo\Model\User\Exception\UserAlreadyExists;
 use Prooph\ProophessorDo\Model\User\Exception\UserNotFound;
 use Prooph\ProophessorDo\Model\User\Exception\UserNotUseIm;
-use Prooph\ProophessorDo\Model\User\Query\GetAllUsers;
-use Prooph\ProophessorDo\Model\User\Service\ChecksUniqueUsersEmailAddress;
-use Prooph\ProophessorDo\Model\User\User;
 use Prooph\ProophessorDo\Model\User\UserCollection;
-use React\Promise\Deferred;
+use SwooleTW\Http\Websocket\Facades\Websocket;
+
 
 class UserOnlineHandler
 {
@@ -42,14 +39,14 @@ class UserOnlineHandler
 
     public function __invoke(UserOnlineCommand $command): void
     {
-        global $server;
-        if(!isset($server))
-            throw UserNotUseIm::withUserId($command->userId());
+//        if (!App::environment('testing')) {
+//            Websocket::;
+//            if(!isset($server))
+//                throw UserNotUseIm::withUserId($command->userId());
+//        }
         if (! $user = $this->userCollection->get($command->userId())) {
             throw UserNotFound::withUserId($command->userId());
         } else {
-//            global $server, $frame;
-//            $user->userOnline($frame->fd);
             $user->userOnline($command->fd());
         }
 

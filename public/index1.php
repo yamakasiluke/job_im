@@ -66,62 +66,82 @@ $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 ////    $response->header("Content-Type", "text/html; charset=utf-8");
 //    $response->end($r->getContent());
 //});
+//$req = Illuminate\Http\Request::create(
+//    "/api/commands/send-message-to-group-member",
+//    'POST',
+//    [],[],[],[],
+//);
+//$r = $kernel->handle($req
+//);
 
+//$data = (object)array(
+//    'email' => 'Sally@gmail.com',
+//    'password' => 'Sally@gmail.com',
+//    'device_name' => 'test');
+//var_dump(json_encode($data));
+//$req = Illuminate\Http\Request::create(
+//    "/api/commands/apply-access-token",
+//    'POST',
+//    [],[],[],[],
+//    json_encode($data)
+//);
+//$r = $kernel->handle($req);
+//var_dump($r->getContent());
 
 $server = new Swoole\WebSocket\Server("0.0.0.0", 9502);
 
-$server->on('handshake', function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
-    // print_r( $request->header );
-    // if (如果不满足我某些自定义的需求条件，那么返回end输出，返回false，握手失败) {
-    //    $response->end();
-    //     return false;
-    // }
-
-    // websocket握手连接算法验证
-
-
-//    var_dump($request);
-
-//    echo "handshake";
-    $secWebSocketKey = $request->header['sec-websocket-key'];
-    $patten = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
-    if (0 === preg_match($patten, $secWebSocketKey) || 16 !== strlen(base64_decode($secWebSocketKey))) {
-        $response->end();
-        return false;
-    }
-//    echo $request->header['sec-websocket-key'];
-    $key = base64_encode(
-        sha1(
-            $request->header['sec-websocket-key'] . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11',
-            true
-        )
-    );
-
-    $headers = [
-        'Upgrade' => 'websocket',
-        'Connection' => 'Upgrade',
-        'Sec-WebSocket-Accept' => $key,
-        'Sec-WebSocket-Version' => '13',
-    ];
-
-    // WebSocket connection to 'ws://127.0.0.1:9502/'
-    // failed: Error during WebSocket handshake:
-    // Response must not include 'Sec-WebSocket-Protocol' header if not present in request: websocket
-    if (isset($request->header['sec-websocket-protocol'])) {
-        $headers['Sec-WebSocket-Protocol'] = $request->header['sec-websocket-protocol'];
-    }
-
-    foreach ($headers as $key => $val) {
-        $response->header($key, $val);
-    }
-
-
-    $response->status(101);
-    $response->end();
-
-    // step 1 online get fd
-    return true;
-});
+//$server->on('handshake', function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+//    // print_r( $request->header );
+//    // if (如果不满足我某些自定义的需求条件，那么返回end输出，返回false，握手失败) {
+//    //    $response->end();
+//    //     return false;
+//    // }
+//
+//    // websocket握手连接算法验证
+//
+//
+////    var_dump($request);
+//
+////    echo "handshake";
+//    $secWebSocketKey = $request->header['sec-websocket-key'];
+//    $patten = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
+//    if (0 === preg_match($patten, $secWebSocketKey) || 16 !== strlen(base64_decode($secWebSocketKey))) {
+//        $response->end();
+//        return false;
+//    }
+////    echo $request->header['sec-websocket-key'];
+//    $key = base64_encode(
+//        sha1(
+//            $request->header['sec-websocket-key'] . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11',
+//            true
+//        )
+//    );
+//
+//    $headers = [
+//        'Upgrade' => 'websocket',
+//        'Connection' => 'Upgrade',
+//        'Sec-WebSocket-Accept' => $key,
+//        'Sec-WebSocket-Version' => '13',
+//    ];
+//
+//    // WebSocket connection to 'ws://127.0.0.1:9502/'
+//    // failed: Error during WebSocket handshake:
+//    // Response must not include 'Sec-WebSocket-Protocol' header if not present in request: websocket
+//    if (isset($request->header['sec-websocket-protocol'])) {
+//        $headers['Sec-WebSocket-Protocol'] = $request->header['sec-websocket-protocol'];
+//    }
+//
+//    foreach ($headers as $key => $val) {
+//        $response->header($key, $val);
+//    }
+//
+//
+//    $response->status(101);
+//    $response->end();
+//
+//    // step 1 online get fd
+//    return true;
+//});
 
 $server->on('open', function (Swoole\WebSocket\Server $server, $request) {
     echo "server: handshake success with fd{$request->fd}\n";
@@ -132,20 +152,21 @@ $server->on('open', function (Swoole\WebSocket\Server $server, $request) {
 $server->on('message', function (Swoole\WebSocket\Server $server, $frame) {
     global $kernel;
     $d = json_decode($frame->data);
-    $d->fd = $frame->fd;
-    // step 2 send command
+    $d = ['email' => "Sally@gmail.com", 'password' => "2ally@gmail.com",];
+//    $d->fd = $frame->fd;
+//    $d->email = "Sally@gmail.com";
+//    $d->password = "Sally@gmail.com";
+//     step 2 send command
     $req = Illuminate\Http\Request::create(
-        "/api/commands/send-message-to-group-member",
+        "/api/commands/register-user",
         'POST',
-        [],[],[],[],
+        $d,[],[],[],
         json_encode($d)
     );
     $r = $kernel->handle($req
     );
-
-
     echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
-    $server->push($frame->fd, $r->getContent());
+    $server->push($frame->fd, "Asdfadsfa".$r->getContent());
 });
 
 $server->on('close', function ($ser, $fd) {
@@ -155,16 +176,33 @@ $server->on('close', function ($ser, $fd) {
 
 
 $server->on('request', function (swoole_http_request $request, swoole_http_response $response) {
-    global $kernel;
-    $req = Illuminate\Http\Request::create(
-        "/api/commands/send-message-to-group-member",
-        'POST'
-    );
-    $r = $kernel->handle($req
-    );
-    global $app;
-    $app->call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
-    var_dump($app->call('App\Http\Controllers\ApiCommandController@postAction', [$request]));
+//    global $kernel;
+//    $d = json_decode($frame->data);
+//    $d->fd = $frame->fd;
+//     step 2 send command
+//    $req = Illuminate\Http\Request::create(
+//        "/api/commands/register-user",
+//        'POST',
+//        [],[],[],[],
+////        json_encode($d)
+//    );
+//    $r = $kernel->handle($req
+//    );
+
+
+//    echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
+//    $server->push($frame->fd, $r->getContent());
+//    $response->end($r->getContent());
+//    global $kernel;
+//    $req = Illuminate\Http\Request::create(
+//        "/api/commands/send-message-to-group-member",
+//        'POST'
+//    );
+//    $r = $kernel->handle($req
+//    );
+//    global $app;
+//    $app->call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+//    var_dump($app->call('App\Http\Controllers\ApiCommandController@postAction', [$request]));
     //    echo "herer1";
 //    global $kernel,$app;
 //    $a = $app->make(Prooph\ServiceBus\CommandBus::class);
@@ -378,8 +416,8 @@ $server->on('request', function (swoole_http_request $request, swoole_http_respo
 
         </html>
 HTML;
-//    $response->end($res);
-    $response->end();
+    $response->end($res);
+//    $response->end();
 
 });
 $server->start();

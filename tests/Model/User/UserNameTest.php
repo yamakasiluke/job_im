@@ -12,7 +12,7 @@
 declare(strict_types=1);
 
 
-namespace Tests\Model\UserNameTest;
+namespace Tests\Model;
 
 use Prooph\ProophessorDo\Model\User\Exception\InvalidName;
 use Prooph\ProophessorDo\Model\User\UserName;

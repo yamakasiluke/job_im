@@ -12,6 +12,9 @@
 |
 */
 
+Route::get('/try',
+    [\App\Http\Controllers\websocket::class, 'get']
+);
 
 Route::get('/', [
     'as' => 'page::home',

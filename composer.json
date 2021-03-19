@@ -22,15 +22,16 @@
         "php": ">=7.1.0",
         "camuthig/event-store-laravel-package": "dev-master",
         "camuthig/service-bus-laravel-package": "dev-master",
-        "laravel/sanctum": "^2.5",
         "doctrine/dbal": "^2.6",
+        "fideloper/proxy": "^4.4",
         "laravel/framework": "8.0",
+        "laravel/sanctum": "^2.5",
         "laravel/tinker": "~2.5",
         "prooph/event-sourcing": "^5.2",
         "prooph/event-store-bus-bridge": "^3.0",
         "rcrowe/twigbridge": "^0.12",
-        "zendframework/zend-validator": "^2.10",
-        "fideloper/proxy": "^4.4"
+        "swooletw/laravel-swoole": "^2.7",
+        "zendframework/zend-validator": "^2.10"
     },
     "require-dev": {
         "filp/whoops": "^2.0",

@@ -129,7 +129,7 @@ final class SendMessageToGroup extends AggregateChanged
     public function messageText(): MessageText
     {
         if (null === $this->messageText) {
-            $this->messageText = UserId::fromString($this->payload['message_text']);
+            $this->messageText = MessageText::fromString($this->payload['message_text']);
         }
 
         return $this->messageText;

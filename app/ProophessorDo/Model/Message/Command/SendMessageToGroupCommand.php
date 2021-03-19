@@ -36,7 +36,14 @@ final class SendMessageToGroupCommand extends Command implements PayloadConstruc
 //'receiver_id' => $receiverId->toString(),
 //'message_text' => $messageText->toString(),
 
-    public static function withData(string $messageText, string $senderId, string $receiverId): SendMessageToGroupCommand
+    public static function withData(
+        string $messageText,
+        string $senderId,
+        string $receiverId,
+        string $messageId,
+        string $sender,
+        string $receiver
+    ): SendMessageToGroupCommand
     {
         //Todo change this to user defined MessageID? and sender and recieber
         // user define from api.php
@@ -44,24 +51,24 @@ final class SendMessageToGroupCommand extends Command implements PayloadConstruc
             'message_text' => $messageText,
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
-//            'message_id' => $receiverId,
-//            'sender' => $receiverId,
-//            'receiver' => $receiverId,
+            'message_id' => $messageId,
+            'sender' => $sender,
+            'receiver' => $receiver,
         ]);
     }
     public function messageId(): MessageId
     {
-        return MessageId::generate();
+        return MessageId::fromString($this->payload['message_id']);
     }
 
     public function sender(): Sender
     {
-        return Sender::USER();
+        return Sender::byValue($this->payload['sender']);
     }
 
     public function receiver(): Receiver
     {
-        return Receiver::GROUP();
+        return Receiver::byValue($this->payload['receiver']);;
     }
 
     public function messageText(): MessageText

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\Message\Handler;
 
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Prooph\ProophessorDo\Model\Message\Command\SendMessageToGroupCommand;
 use Prooph\ProophessorDo\Model\Message\Event\SendMessageToGroup;
 use Prooph\ProophessorDo\Model\Message\Exception\UserAlreadyExists;
@@ -19,6 +21,8 @@ use Prooph\ProophessorDo\Model\Message\Exception\UserNotFound;
 use Prooph\ProophessorDo\Model\Message\Service\ChecksUniqueUsersEmailAddress;
 use Prooph\ProophessorDo\Model\Message\Message;
 use Prooph\ProophessorDo\Model\Message\MessageList;
+use Prooph\ProophessorDo\Model\User\Exception\UserNotUseIm;
+use Prooph\ProophessorDo\Model\User\UserId;
 use Prooph\ServiceBus\EventBus;
 
 class SendMessageToGroupHandler
@@ -47,6 +51,13 @@ class SendMessageToGroupHandler
 
     public function __invoke(SendMessageToGroupCommand $command): void
     {
+//        if (!App::environment('testing')) {
+//            global $server;
+//            if(!isset($server))
+//                throw UserNotUseIm::withUserId(
+//                    UserId::fromString(Auth::id()));
+//        }
+
         $message = Message::createMessage(
             $command->messageId(),
             $command->sender(),

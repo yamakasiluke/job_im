@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Model\GroupTest;
+namespace Tests\Model;
 
 use Prooph\ProophessorDo\Model\Group\Event\CreateGroup;
 use Prooph\ProophessorDo\Model\Group\Event\EnterGroup;

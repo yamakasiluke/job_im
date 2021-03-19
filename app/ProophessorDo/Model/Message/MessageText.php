@@ -30,7 +30,7 @@ final class MessageText implements ValueObject
     private function __construct(string $text)
     {
         try {
-            Assertion::minLength($text, 3);
+            Assertion::minLength($text, 1);
         } catch (\Exception $e) {
             throw Exception\InvalidText::reason($e->getMessage());
         }

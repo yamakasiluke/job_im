@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Prooph\ProophessorDo\Model\Group\GroupId;
+use Prooph\ProophessorDo\Model\Message\MessageId;
+use Prooph\ProophessorDo\Model\Message\Receiver;
+use Prooph\ProophessorDo\Model\Message\Sender;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +33,6 @@ Route::middleware(['command_name'])->group(function () {
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-
             $json = $request->json();
             $userId = \Prooph\ProophessorDo\Model\User\UserId::generate()->toString();
             $json->add([
@@ -37,7 +40,6 @@ Route::middleware(['command_name'])->group(function () {
             ]);
             $request = $request->setJson($json);
             return App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
-//            return $userId;
         }
     ]);
     Route::post('/commands/apply-access-token', [
@@ -93,7 +95,8 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
                 ]);
             }
 
-            return App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            return $request->user()->id;
         }
     ]);
     Route::post('/commands/user-logout', [
@@ -109,12 +112,15 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
         'as' => 'command::send-message-to-group',
         function (Request $request) {
             $json = $request->json();
+            $messageId = MessageId::generate()->toString();
             $json->add([
-                'group_id' => GroupId::generate()->toString(),
-//                'owner'
+                'message_id' => $messageId,
+                'sender' => Sender::USER()->getValue(),
+                'receiver' => Receiver::GROUP()->getValue(),
             ]);
             $request = $request->setJson($json);
-            return App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            return $messageId;
         }
     ]);
 
@@ -125,16 +131,23 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
     ]);
 
     Route::post('/commands/create-group', [
-        'as' => 'command::apply-access-token',
+        'as' => 'command::create-group',
         function (Request $request) {
+            $groupId = GroupId::generate()->toString();
             $json = $request->json();
             $json->add([
-//            'message_id' => $receiverId,
-//            'sender' => Sender,
-//            'receiver' => Receiver,
+                'group_id' => $groupId,
+                'owner' => $request->user()->id,
             ]);
             $request = $request->setJson($json);
-            return App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            if($response->isSuccessful()){
+                $json = json_decode($response->getContent());
+                $json->groupid = $groupId;
+                $response->setJson(json_encode($json));
+            }
+            return $response;
+
         }
     ]);
     Route::post('/commands/enter-group', [
@@ -144,7 +157,20 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
 
     Route::post('/commands/user-online', [
         'as' => 'command::apply-access-token',
-        'uses' => 'ApiCommandController@postAction'
+        function (Request $request) {
+            $json = $request->json();
+            $json->add([
+                'user_id' => $request->user()->id,
+            ]);
+            $request = $request->setJson($json);
+            $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            if($response->isSuccessful()){
+                $json = json_decode($response->getContent());
+                $json->fd = $request->json("fd");
+                $response->setJson(json_encode($json));
+            }
+            return $response;
+        }
     ]);
 
     Route::post('/commands/add-deadline-to-todo', [

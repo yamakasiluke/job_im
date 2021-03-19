@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\Group;
 
+use Illuminate\Support\Facades\App;
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventSourcing\AggregateRoot;
 use Prooph\ProophessorDo\Model\Entity;
@@ -22,6 +23,8 @@ use Prooph\ProophessorDo\Model\Group\Event\SendMessageToGroupMember;
 use Prooph\ProophessorDo\Model\Message\MessageId;
 use Prooph\ProophessorDo\Model\Message\MessageText;
 use Prooph\ProophessorDo\Model\User\UserId;
+use SwooleTW\Http\Server\Facades\Server;
+use SwooleTW\Http\Websocket\Facades\Websocket;
 
 final class Group extends AggregateRoot implements Entity
 {
@@ -105,15 +108,11 @@ final class Group extends AggregateRoot implements Entity
 
     public function sendMessageToGroupMember(GroupId $groupId, MessageId $messageId, MessageText $messageText, array $members): void
     {
-        global $server;
+        $server = App::make(Server::class);
         if(isset($server)){
-            foreach ($server->connections as $fd) {
-                // 需要先判断是否是正确的websocket连接，否则有可能会push失败
-                if ($server->isEstablished($fd)) {
-                    $server->push($fd, $messageText->toString());
-                }
-            }
             foreach ($members as $id => $fd) {
+                var_dump($members);
+                var_dump($fd, $messageText->toString());
                 // 需要先判断是否是正确的websocket连接，否则有可能会push失败
                 if ($server->isEstablished($fd)) {
                     $server->push($fd, $messageText->toString());
