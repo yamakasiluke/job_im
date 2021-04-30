@@ -26,6 +26,20 @@ use Prooph\ProophessorDo\Model\User\UserId;
 use SwooleTW\Http\Server\Facades\Server;
 use SwooleTW\Http\Websocket\Facades\Websocket;
 
+class Message
+{
+    public $sender_id;
+    public $receiver_id;
+    public $message;
+
+    public function __construct(array $data)
+    {
+        $this->sender_id = $data['senderId'];
+        $this->receiver_id = $data['receiverId'];
+        $this->message = $data['message'];
+    }
+}
+
 final class Group extends AggregateRoot implements Entity
 {
     /**
@@ -106,16 +120,28 @@ final class Group extends AggregateRoot implements Entity
         $this->recordThat(EnterGroup::withData($groupId, $newMembers));
     }
 
-    public function sendMessageToGroupMember(GroupId $groupId, MessageId $messageId, MessageText $messageText, array $members): void
+    public function sendMessageToGroupMember(
+        GroupId $groupId,
+        MessageId $messageId,
+        MessageText $messageText,
+        array $members,
+        UserId $senderId
+    ): void
     {
         $server = App::make(Server::class);
+        $message = new Message(array(
+            "senderId" => $senderId->toString(),
+            "receiverId" => $groupId->toString(),
+            "message" => $messageText->toString()
+            )
+        );
+        var_dump($message);
+        var_dump( json_encode($message));
         if(isset($server)){
             foreach ($members as $id => $fd) {
-                var_dump($members);
-                var_dump($fd, $messageText->toString());
                 // 需要先判断是否是正确的websocket连接，否则有可能会push失败
                 if ($server->isEstablished($fd)) {
-                    $server->push($fd, $messageText->toString());
+                    $server->push($fd, json_encode($message));
                 }
             }
 

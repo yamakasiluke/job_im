@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Prooph\ProophessorDo\Model\Message\MessageId;
 use Prooph\ProophessorDo\Model\Message\Receiver;
 use Prooph\ProophessorDo\Model\Message\Sender;
+use SwooleTW\Http\Server\Facades\Server;
 use SwooleTW\Http\Websocket\Facades\Websocket;
 
 /*
@@ -21,38 +22,46 @@ use SwooleTW\Http\Websocket\Facades\Websocket;
 */
 
 Websocket::on('connect', function ($websocket, Request $request) {
-    var_dump($request->user()->id);
+    echo "here";
     $req = Illuminate\Http\Request::create(
-        "/api/commands/register-user",
+        "/api/commands/user-online",
         'POST'
     );
-    $json = $req->json();
-    $json->add([
+    var_dump($request->user()->id);
+    $req->json()->add([
         'user_id' => $request->user()->id,
         'fd' => $request->fd,
     ]);
-    $response = App::call('App\Http\Controllers\WebsocketCommandController@postAction', ['request' => $req]);
-    Websocket::emit('message', 'this is a connect');
+    $req->attributes->add(['prooph_command_name' => config(sprintf('app.command_alias.%s', basename($req->url())))]);
+    $response = App::call('App\Http\Controllers\ApiCommandController@postAction', ['request' => $req]);
+
+    if(!$response->isSuccessful()){
+        Websocket::emit('message', $response->getContent());
+        Websocket::close();
+    }
+    else
+        Websocket::emit('message', ['userid'=>$request->user()->id, 'connect'=>true]);
+    var_dump($request->user()->id);
 });
 
-Websocket::on('enterGroup', function ($websocket, $data) {
-    $req = Illuminate\Http\Request::create(
-        "/api/commands/enter-group",
-        'POST',
-    );
-    $messageId = MessageId::generate()->toString();
-    $req->json()->add([
-        'message_id' => $messageId,
-        'sender' => Sender::USER()->getValue(),
-        'receiver' => Receiver::GROUP()->getValue(),
-    ]);
-    $req->json()->add($data);
-    $req->attributes->add(['prooph_command_name' => config(sprintf('app.command_alias.%s', basename($req->url())))]);
-    App::call('App\Http\Controllers\ApiCommandController@postAction', ['request' => $req]);
-    Websocket::broadcast()->emit('message', $data['message_text']);
-});
+//Websocket::on('enterGroup', function ($websocket, $data) {
+//    $req = Illuminate\Http\Request::create(
+//        "/api/commands/enter-group",
+//        'POST',
+//    );
+//    $req->json()->add($data);
+//    $req->attributes->add(['prooph_command_name' => config(sprintf('app.command_alias.%s', basename($req->url())))]);
+//    $response = App::call('App\Http\Controllers\ApiCommandController@postAction', ['request' => $req]);
+//    if(!$response->isSuccessful()){
+//        Websocket::emit('message', $response->getContent());
+//        Websocket::close();
+//    }
+//    else
+//        Websocket::emit('message', []);
+//});
 
 Websocket::on('sendMessageToGroup', function ($websocket, $data) {
+    echo"here";
     $req = Illuminate\Http\Request::create(
         "/api/commands/send-message-to-group",
         'POST',
@@ -65,8 +74,13 @@ Websocket::on('sendMessageToGroup', function ($websocket, $data) {
     ]);
     $req->json()->add($data);
     $req->attributes->add(['prooph_command_name' => config(sprintf('app.command_alias.%s', basename($req->url())))]);
-    App::call('App\Http\Controllers\ApiCommandController@postAction', ['request' => $req]);
-    Websocket::broadcast()->emit('message', $data['message_text']);
+    $response = App::call('App\Http\Controllers\ApiCommandController@postAction', ['request' => $req]);
+//    if(!$response->isSuccessful()){
+//        Websocket::emit('message', $response->getContent());
+//    }
+//    else
+//        Websocket::broadcast()->emit('message', ['sender_id'=>$data['sender_id'], 'message'=>$data['message_text']]);
+
 });
 
 Websocket::on('disconnect', function ($websocket) {
@@ -74,6 +88,7 @@ Websocket::on('disconnect', function ($websocket) {
 });
 
 Websocket::on('example', function ($websocket, $data) {
+    echo "exampleexampleexampleexampleexample";
     $websocket->emit('message', $data);
 });
 

@@ -34,6 +34,8 @@ class SendMessageToGroupMembersProcessManager
             $event->receiverId(),
             $event->messageText(),
             $event->messageId(),
+            $event->senderId(),
+
         ));
     }
 }

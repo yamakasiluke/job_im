@@ -25,8 +25,8 @@ class websocket extends BaseController
         <body>
         Welcome<br/><input id="text" type="text"/>
         <br/>token<select id="token">
-            <option value="2paiZiWRGN7pFABbQKSd9Pxl2z0zeH0s0MLp9k6Z">1</option>
-            <option value="YVKPFE0mc3f1gIUQBb1NsncULaYokaT70YwfYB1L">2</option>
+            <option value="6ae196d0-2395-40e4-aae6-53bf44ec3fa2|IQrzg8BPCPL7ZTbA2nv8Qa4hInoMD3AfEKBv7Pf2">1</option>
+            <option value="a5ef291a-d9aa-4413-9b6b-bf54883a4957|c68Ql8WJ8N3bYMIOdqv18mYPMezAq0RNjmbCQ4dW">2</option>
         </select>
         <button onclick="send()">发送消息</button>
         <button onclick="token()">SETTOKEN</button>
@@ -60,7 +60,7 @@ class websocket extends BaseController
 
 
         function connect(s) {
-            websocket = new WebSocket("ws://localhost:9501?token="+s);
+            websocket = new WebSocket("ws://localhost:9502?token="+s);
             // var websocket = new WebSocket('ws://localhost:9501');
             websocket.onopen = function() {
                 setMessageInnerHTML("WebSocket连接成功");

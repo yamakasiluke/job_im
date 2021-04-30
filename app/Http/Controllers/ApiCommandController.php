@@ -96,7 +96,6 @@ class  ApiCommandController extends Controller
     {
         $payload = $request->json()->all();
 
-
         switch (json_last_error()) {
             case JSON_ERROR_DEPTH:
                 throw new \Exception('Invalid JSON, maximum stack depth exceeded.', 400);

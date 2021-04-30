@@ -69,7 +69,13 @@ class SendMessageToGroupMemberHandler
                 $members[$id] = $user->fd();
         }
 
-        $group->sendMessageToGroupMember($command->groupId(), $command->messageId(),  $command->messageText(), $members);
+        $group->sendMessageToGroupMember(
+            $command->groupId(),
+            $command->messageId(),
+            $command->messageText(),
+            $members,
+            $command->senderId(),
+        );
 
 
         $this->groupCollection->save($group);

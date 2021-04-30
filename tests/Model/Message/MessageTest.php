@@ -30,78 +30,78 @@ use Tests\TestCase;
 
 class MessageTest extends TestCase
 {
-    public function it_user_send_message_to_group(): Message
-    {
-        $group = new GroupTest();
-        $group = $group->it_random_user_enter_a_group();
-
-//        'message_text' => $messageText,
-//            'sender_id' => $senderId,
-//            'receiver_id' => $receiverId,
-        $messageText = MessageText::fromString("this is test message from test");
-        $senderId = $group->owner();
-        $receiverId = $group->groupId();
-        $messageId = MessageId::generate();
-        $message = Message::createMessage(
-            $messageId,
-            $sender = Sender::USER(),
-            $senderId,
-            $receiver = Receiver::GROUP(),
-            $receiverId,
-            $messageText
-        );
-
-        $this->assertInstanceOf(Message::class, $message);
-        $events = $this->popRecordedEvent($message);
-
-        $this->assertEquals(1, \count($events));
-        $this->assertInstanceOf(SendMessageToGroup::class, $events[0]);
-
-        $expectedPayload = [
-            'sender' => $sender->toString(),
-            'receiver' => $receiver->toString(),
-            'sender_id' => $senderId->toString(),
-            'receiver_id' => $receiverId->toString(),
-            'message_text' => $messageText->toString(),
-        ];
-        $this->assertEquals($expectedPayload, $events[0]->payload());
-        return $message;
-    }
-    /**
-     * @test
-     */
-    public function it_send_message_to_group_member(): Group
-    {
-        $group = new GroupTest();
-        $group = $group->it_random_user_enter_a_group();
-
-        $message = $this->it_user_send_message_to_group();
-//        'group_id' => $groupId->toString(),
+//    public function it_user_send_message_to_group(): Message
+//    {
+//        $group = new GroupTest();
+//        $group = $group->it_random_user_enter_a_group();
+//
+////        'message_text' => $messageText,
+////            'sender_id' => $senderId,
+////            'receiver_id' => $receiverId,
+//        $messageText = MessageText::fromString("this is test message from test");
+//        $senderId = $group->owner();
+//        $receiverId = $group->groupId();
+//        $messageId = MessageId::generate();
+//        $message = Message::createMessage(
+//            $messageId,
+//            $sender = Sender::USER(),
+//            $senderId,
+//            $receiver = Receiver::GROUP(),
+//            $receiverId,
+//            $messageText
+//        );
+//
+//        $this->assertInstanceOf(Message::class, $message);
+//        $events = $this->popRecordedEvent($message);
+//
+//        $this->assertEquals(1, \count($events));
+//        $this->assertInstanceOf(SendMessageToGroup::class, $events[0]);
+//
+//        $expectedPayload = [
+//            'sender' => $sender->toString(),
+//            'receiver' => $receiver->toString(),
+//            'sender_id' => $senderId->toString(),
+//            'receiver_id' => $receiverId->toString(),
 //            'message_text' => $messageText->toString(),
-//            'message_id' => $messageId->toString(),
-        $members = [1=>1];
-        $group->sendMessageToGroupMember(
-            $group->groupId(),
-            $message->messageId(),
-            $message->messageText(),
-            $members
-        );
-        $this->assertInstanceOf(Group::class, $group);
-        $events = $this->popRecordedEvent($group);
-
-        $this->assertEquals(1, \count($events));
-        $this->assertInstanceOf(SendMessageToGroupMember::class, $events[0]);
-
-        $expectedPayload = [
-            'message_id' => $message->messageId()->toString(),
-            'message_text' => $message->messageText()->toString(),
-        ];
-        $this->assertEquals($expectedPayload, $events[0]->payload());
-
-        return $group;
-
-
-    }
+//        ];
+//        $this->assertEquals($expectedPayload, $events[0]->payload());
+//        return $message;
+//    }
+//    /**
+//     * @test
+//     */
+//    public function it_send_message_to_group_member(): Group
+//    {
+//        $group = new GroupTest();
+//        $group = $group->it_random_user_enter_a_group();
+//
+//        $message = $this->it_user_send_message_to_group();
+////        'group_id' => $groupId->toString(),
+////            'message_text' => $messageText->toString(),
+////            'message_id' => $messageId->toString(),
+//        $members = [1=>1];
+//        $group->sendMessageToGroupMember(
+//            $group->groupId(),
+//            $message->messageId(),
+//            $message->messageText(),
+//            $members
+//        );
+//        $this->assertInstanceOf(Group::class, $group);
+//        $events = $this->popRecordedEvent($group);
+//
+//        $this->assertEquals(1, \count($events));
+//        $this->assertInstanceOf(SendMessageToGroupMember::class, $events[0]);
+//
+//        $expectedPayload = [
+//            'message_id' => $message->messageId()->toString(),
+//            'message_text' => $message->messageText()->toString(),
+//        ];
+//        $this->assertEquals($expectedPayload, $events[0]->payload());
+//
+//        return $group;
+//
+//
+//    }
 
 }
 

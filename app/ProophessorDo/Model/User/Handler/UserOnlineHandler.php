@@ -51,5 +51,6 @@ class UserOnlineHandler
         }
 
         $this->userCollection->save($user);
+
     }
 }

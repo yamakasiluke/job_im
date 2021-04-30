@@ -14,7 +14,6 @@ class WebsocketAuth extends Authenticate
 
     public function handle($request, Closure $next, ...$guards) {
         $request->headers->set('Authorization', 'Bearer ' . $request->get('token'));
-        var_dump($request->get('token'));
         $this->authenticate($request, ['sanctum']);
         return $next($request);
     }

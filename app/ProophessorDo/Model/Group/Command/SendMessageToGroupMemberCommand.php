@@ -19,23 +19,35 @@ use Prooph\Common\Messaging\PayloadTrait;
 use Prooph\ProophessorDo\Model\Group\GroupId;
 use Prooph\ProophessorDo\Model\Message\MessageId;
 use Prooph\ProophessorDo\Model\Message\MessageText;
+use Prooph\ProophessorDo\Model\User\UserId;
 
 final class SendMessageToGroupMemberCommand extends Command implements PayloadConstructable
 {
     use PayloadTrait;
 
-    public static function withData(GroupId $groupId, MessageText $messageText, MessageId $messageId): SendMessageToGroupMemberCommand
+    public static function withData(
+        GroupId $groupId,
+        MessageText $messageText,
+        MessageId $messageId,
+        UserId $senderId
+    ): SendMessageToGroupMemberCommand
     {
         return new self([
             'group_id' => $groupId->toString(),
             'message_text' => $messageText->toString(),
             'message_id' => $messageId->toString(),
+            'sender_id' => $senderId->toString(),
         ]);
     }
 
     public function groupId(): GroupId
     {
         return GroupId::fromString($this->payload['group_id']);
+    }
+
+    public function senderId(): UserId
+    {
+        return UserId::fromString($this->payload['sender_id']);
     }
 
     public function messageId(): MessageId

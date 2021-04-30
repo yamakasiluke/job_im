@@ -39,7 +39,8 @@ Route::middleware(['command_name'])->group(function () {
                 'user_id' => $userId,
             ]);
             $request = $request->setJson($json);
-            return App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            return $response;
         }
     ]);
     Route::post('/commands/apply-access-token', [
@@ -70,8 +71,13 @@ Route::middleware(['command_name'])->group(function () {
                 'abilities' => ['*'],
             ]);
             $request = $request->setJson($json);
-            App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
-            return $token;
+            $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            if($response->isSuccessful()){
+                $json = json_decode($response->getContent());
+                $json->token = $token;
+                $response->setJson(json_encode($json));
+            }
+            return $response;
         }
     ]);
 });
@@ -95,8 +101,13 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
                 ]);
             }
 
-            App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
-            return $request->user()->id;
+            $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            if($response->isSuccessful()){
+                $json = json_decode($response->getContent());
+                $json->user_id = $request->user()->id;
+                $response->setJson(json_encode($json));
+            }
+            return $response;
         }
     ]);
     Route::post('/commands/user-logout', [
@@ -119,8 +130,13 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
                 'receiver' => Receiver::GROUP()->getValue(),
             ]);
             $request = $request->setJson($json);
-            App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
-            return $messageId;
+            $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            if($response->isSuccessful()){
+                $json = json_decode($response->getContent());
+                $json->message_id = $messageId;
+                $response->setJson(json_encode($json));
+            }
+            return $response;
         }
     ]);
 
@@ -143,7 +159,7 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
             $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
             if($response->isSuccessful()){
                 $json = json_decode($response->getContent());
-                $json->groupid = $groupId;
+                $json->group_id = $groupId;
                 $response->setJson(json_encode($json));
             }
             return $response;
@@ -207,32 +223,4 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
         'as' => 'command::publish-good',
         'uses' => 'ApiCommandController@postAction'
     ]);
-//
-//    'register-user' => \
-//    'user-login' => \P
-//  'user-logout' => \
-//    'user-online' => \
-//      'apply-access-token
-
-//  'enter-group' => \
-//  'exit-group' => \P
-
-//  'send-message' =>
-
-//    'user-offline' =>
-//  'user-anonymous' =
-
-
-//    SendMessageToGroupMember
-
-
-//    Route::post('/commands/send-message', [
-//        'as' => 'command::publish-good',
-//        'uses' => 'ApiCommandController@postAction'
-//    ]);
-//
-//    Route::post('/commands/enter-group', [
-//        'as' => 'command::publish-good',
-//        'uses' => 'ApiCommandController@postAction'
-//    ]);
 });
