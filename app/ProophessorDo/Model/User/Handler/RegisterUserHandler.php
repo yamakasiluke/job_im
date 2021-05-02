@@ -12,12 +12,15 @@ declare(strict_types=1);
 
 namespace Prooph\ProophessorDo\Model\User\Handler;
 
+use http\Message;
 use Prooph\ProophessorDo\Model\User\Command\RegisterUserCommand;
+use Prooph\ProophessorDo\Model\User\Event\RegisterUser;
 use Prooph\ProophessorDo\Model\User\Exception\UserAlreadyExists;
 use Prooph\ProophessorDo\Model\User\Exception\UserNotFound;
 use Prooph\ProophessorDo\Model\User\Service\ChecksUniqueUsersEmailAddress;
 use Prooph\ProophessorDo\Model\User\User;
 use Prooph\ProophessorDo\Model\User\UserCollection;
+use Prooph\ServiceBus\EventBus;
 
 class RegisterUserHandler
 {
@@ -30,13 +33,19 @@ class RegisterUserHandler
      * @var ChecksUniqueUsersEmailAddress
      */
     private $checksUniqueUsersEmailAddress;
+    /**
+     * @var EventBus
+     */
+    private $eventBus;
 
     public function __construct(
         UserCollection $userCollection,
-        ChecksUniqueUsersEmailAddress $checksUniqueUsersEmailAddress
+        ChecksUniqueUsersEmailAddress $checksUniqueUsersEmailAddress,
+        EventBus $eventBus
     ) {
         $this->userCollection = $userCollection;
         $this->checksUniqueUsersEmailAddress = $checksUniqueUsersEmailAddress;
+        $this->eventBus = $eventBus;
     }
 
     public function __invoke(RegisterUserCommand $command): void
@@ -51,8 +60,10 @@ class RegisterUserHandler
                 throw UserAlreadyExists::withUserId($command->userId());
             }
             $user = User::registerWithData($command->userId(), $command->name(), $command->emailAddress(), $command->password());
+            $this->eventBus->dispatch(RegisterUser::withData($command->userId(), $command->name(), $command->emailAddress(), $command->password()));
         }
 
         $this->userCollection->save($user);
+
     }
 }

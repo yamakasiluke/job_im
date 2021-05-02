@@ -40,6 +40,11 @@ Route::middleware(['command_name'])->group(function () {
             ]);
             $request = $request->setJson($json);
             $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
+            if($response->isSuccessful()){
+                $json = json_decode($response->getContent());
+                $json->name = "ok";
+                $response->setJson(json_encode($json));
+            }
             return $response;
         }
     ]);
@@ -111,11 +116,11 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
         }
     ]);
     Route::post('/commands/user-logout', [
-        'as' => 'command::apply-access-token',
+        'as' => 'command::user-logout',
         'uses' => 'ApiCommandController@postAction'
     ]);
     Route::post('/commands/user-anonymous', [
-        'as' => 'command::apply-access-token',
+        'as' => 'command::user-anonymous',
         'uses' => 'ApiCommandController@postAction'
     ]);
 
@@ -167,12 +172,12 @@ Route::middleware(['command_name', 'auth:sanctum'])->group(function () {
         }
     ]);
     Route::post('/commands/enter-group', [
-        'as' => 'command::apply-access-token',
+        'as' => 'command::enter-group',
         'uses' => 'ApiCommandController@postAction'
     ]);
 
     Route::post('/commands/user-online', [
-        'as' => 'command::apply-access-token',
+        'as' => 'command::user-online',
         function (Request $request) {
             $json = $request->json();
             $json->add([

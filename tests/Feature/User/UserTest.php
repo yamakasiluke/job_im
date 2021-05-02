@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class UserTest extends TestCase
 {
+    public $email = 'Sally@gmail3.com';
+    public $password = 'Sally@gmail3.com';
 
 //    use RefreshDatabase;
     /**
@@ -19,8 +21,8 @@ class UserTest extends TestCase
             'X-Header' => 'Value',
         ])->postJson('/api/commands/register-user',
             [
-                'email' => 'Sally@gmail.com',
-                'password' => 'Sally@gmail.com',
+                'email' => $this->email,
+                'password' => $this->password,
             ]);
         $response->assertStatus(202);
     }
@@ -33,8 +35,8 @@ class UserTest extends TestCase
             'X-Header' => 'Value',
         ])->postJson('/api/commands/apply-access-token',
             [
-                'email' => 'Sally@gmail.com',
-                'password' => 'Sally@gmail.com',
+                'email' => $this->email,
+                'password' => $this->password,
                 'device_name' => 'test',
             ]);
         $response->assertStatus(202);
@@ -52,8 +54,8 @@ class UserTest extends TestCase
 
         ])->postJson('/api/commands/user-login',
             [
-                'email' => 'Sally@gmail.com',
-                'password' => 'Sally@gmail.com',
+                'email' => $this->email,
+                'password' => $this->password,
             ]);
         $response->assertStatus(202);
         return $response->getContent();

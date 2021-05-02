@@ -109,9 +109,13 @@ return [
                     Model\Todo\Event\TodoWasMarkedAsExpired::class => [
                         \Prooph\ProophessorDo\ProcessManager\SendTodoDeadlineExpiredMailProcessManager::class,
                     ],
+                    Model\User\Event\RegisterUser::class => [
+                        \Prooph\ProophessorDo\ProcessManager\RegisterUserEnterGroupProcessManager::class,
+                    ],
                     Model\Message\Event\SendMessageToGroup::class => [
                         \Prooph\ProophessorDo\ProcessManager\SendMessageToGroupMembersProcessManager::class,
                     ],
+
                 ]
             ]
         ],

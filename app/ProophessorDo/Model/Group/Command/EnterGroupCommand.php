@@ -23,7 +23,7 @@ final class EnterGroupCommand extends Command implements PayloadConstructable
 {
     use PayloadTrait;
 
-    public static function withData(string $groupId, string $members): EnterGroupCommand
+    public static function withData(string $groupId, array $members): EnterGroupCommand
     {
         return new self([
             'group_id' => $groupId,
