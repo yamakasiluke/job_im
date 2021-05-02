@@ -75,6 +75,7 @@ class GroupTest extends TestCase
     public function test_http_enter_group(): string
     {
         $groupId = $this->test_http_create_group();
+        $groupId =  json_decode($groupId)->group_id;
         $token = $this->test_http_apply_access_token();
         $userId = $this->test_http_user_login();
         [$id, $token] = explode('|', $token, 2);

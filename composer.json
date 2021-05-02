@@ -29,12 +29,12 @@
         "doctrine/dbal": "^2.6",
         "fideloper/proxy": "^4.4",
         "laravel/framework": "8.0",
-        "laravel/sanctum": "^2.5",
+        "laravel/sanctum": "dev-master",
         "laravel/tinker": "~2.5",
         "prooph/event-sourcing": "^5.2",
         "prooph/event-store-bus-bridge": "^3.0",
         "rcrowe/twigbridge": "^0.12",
-        "swooletw/laravel-swoole": "^2.7",
+        "swooletw/laravel-swoole": "dev-master",
         "zendframework/zend-validator": "^2.10"
     },
     "require-dev": {
