@@ -40,11 +40,6 @@ Route::middleware(['command_name'])->group(function () {
             ]);
             $request = $request->setJson($json);
             $response = App::call('App\Http\Controllers\ApiCommandController@postAction', [$request]);
-            if($response->isSuccessful()){
-                $json = json_decode($response->getContent());
-                $json->name = "ok";
-                $response->setJson(json_encode($json));
-            }
             return $response;
         }
     ]);
